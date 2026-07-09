@@ -1,63 +1,229 @@
 # PulseForge AI
 
-## PulseForge local startup
+> **AI-Powered Strategic Business Intelligence Platform**
 
-Run the frontend and backend in separate terminals from the project root:
+PulseForge AI transforms real-time public business signals into actionable strategic intelligence by building dynamic **AI Business Twins** of organizations. It helps startups, enterprises, consultants, and business development teams discover strategic partnerships, identify market opportunities, and make evidence-backed business decisions.
 
-```sh
-npm run dev:backend
-npm run dev:frontend
+---
+
+## Overview
+
+Businesses generate thousands of public signals every day through hiring activities, product launches, funding announcements, company websites, press releases, and market updates.
+
+Manually monitoring these signals is slow, fragmented, and difficult to scale.
+
+PulseForge AI continuously discovers, analyzes, validates, and explains these signals through an agentic AI workflow to deliver strategic recommendations and partnership intelligence.
+
+---
+
+## Features
+
+- AI Business Twin Generation
+- Real-Time Business Signal Collection
+- Partnership Match Engine
+- Evidence-Based Explainability
+- Strategic Ecosystem Visualization
+- Scenario Simulator
+- Executive Decision Support
+- AI Action Hub
+- Presentation Workspace
+- Business Signal Dashboard
+
+---
+
+## AI Workflow
+
+```
+Public Sources
+      │
+      ▼
+Signal Collection Agent
+      │
+      ▼
+Evidence Validation
+      │
+      ▼
+Intent Analysis Agent
+      │
+      ▼
+Business Twin Engine
+      │
+      ▼
+Partnership Intelligence
+      │
+      ▼
+Decision Engine
+      │
+      ▼
+Action Hub
 ```
 
-The frontend checks `VITE_API_BASE_URL` first. In local development only, if it is not set, it tries common local FastAPI ports including `8000`, `8001`, `8002`, and `8011`.
+---
 
-To force one backend URL:
+## Technology Stack
 
-```sh
-VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev:frontend
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- HTML5
+- CSS3
+
+### Backend
+
+- Python
+- FastAPI
+- Uvicorn
+- Pydantic
+
+### AI & Data
+
+- Google Gemini
+- Tavily API
+- NewsAPI
+- BeautifulSoup
+- RSS Feeds
+
+---
+
+## Project Architecture
+
+```
+Frontend (React + TypeScript)
+              │
+              ▼
+FastAPI Backend
+              │
+              ▼
+AI Agent Pipeline
+              │
+      ┌───────┼────────┐
+      ▼       ▼        ▼
+ Tavily    NewsAPI   Website Scraper
+      │       │        │
+      └───────┼────────┘
+              ▼
+Business Twin Engine
+              ▼
+Partnership Intelligence
+              ▼
+Action Hub
 ```
 
-## Vercel deployment
+---
 
-PulseForge deploys as a Vite SPA on Vercel. The FastAPI backend must be deployed separately because it needs private API keys.
+## Key Modules
 
-Vercel settings:
+- Business Twin
+- Partnership Match Engine
+- Signal Intelligence
+- Strategic Ecosystem
+- Scenario Simulator
+- Action Hub
+- Evidence Explorer
+- Presentation Workspace
 
-- Build command: `npm run build`
-- Output directory: `dist`
-- Environment variable: `VITE_API_BASE_URL=https://your-backend-url`
+---
 
-Do not add backend secrets to Vercel frontend environment variables. Keep `TAVILY_API_KEY`, `NEWS_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, and `GOOGLE_CX` on the backend host only.
+## Demo
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full frontend/backend deployment split.
+**Video**
 
-## Vite
+https://youtu.be/qPubB7xTwdg
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Repository
 
-## React Compiler
+https://github.com/Codexia-afk/PulseForge_AI
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## Installation
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Clone
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+git clone https://github.com/Codexia-afk/PulseForge_AI.git
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+### Backend
+
+```bash
+cd backend
+
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload
+```
+
+---
+
+## Environment Variables
+
+Create:
+
+```
+backend/.env
+```
+
+```
+TAVILY_API_KEY=
+NEWS_API_KEY=
+GEMINI_API_KEY=
+OPENAI_API_KEY=
+GOOGLE_API_KEY=
+GOOGLE_CX=
+```
+
+---
+
+## Use Cases
+
+- Business Development
+- Enterprise Strategy
+- Startup Growth
+- Strategic Partnerships
+- Market Intelligence
+- Investment Research
+- Competitive Analysis
+
+---
+
+## Team
+
+- Srinjoy Pramanick
+- Soudip Biswas
+- Anwesha Das
+
+---
+
+## Future Scope
+
+- Live CRM Integrations
+- Salesforce Integration
+- Slack Integration
+- Microsoft Teams Integration
+- Business Knowledge Graph
+- Multi-Agent Collaboration
+- Advanced AI Copilot
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+## Acknowledgements
+
+Built during **Crazy Build Hackathon** with the vision of transforming public business signals into strategic business intelligence through agentic AI.
