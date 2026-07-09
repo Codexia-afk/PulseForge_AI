@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Sparkles, Check, Copy, ArrowRight, ShieldAlert, Cpu, Layers, ExternalLink, Globe, Search, BookOpen, AlertTriangle } from 'lucide-react';
 import { MatchRecommendation } from '../agents/types';
 import { generateDemoMatches } from '../agents/mockRealCompanies';
-import { apiUrl, fetchWithTimeout } from '../lib/api';
+import { apiUrl, fetchWithTimeout, isApiBaseUrlConfigured } from '../lib/api';
 
 interface PartnershipMatchEngineProps {
   mode: 'realworld' | 'demo';
@@ -132,6 +132,10 @@ export const PartnershipMatchEngine: React.FC<PartnershipMatchEngineProps> = ({
     setErrorMessage("Live sources unavailable. Switch to Presentation Mode or retry.");
   };
 
+  const liveBackendSetupMessage = isApiBaseUrlConfigured
+    ? 'FastAPI backend is offline. Check the deployed backend service or switch to Presentation Mode.'
+    : 'Live Intelligence needs VITE_API_BASE_URL. Add it in Vercel or switch to Presentation Mode.';
+
   const handleRunMatchEngine = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.industry) return;
@@ -158,7 +162,7 @@ export const PartnershipMatchEngine: React.FC<PartnershipMatchEngineProps> = ({
     try {
       if (mode === 'realworld') {
         if (!backendHealthy) {
-          throw new Error("FastAPI backend offline.");
+          throw new Error(liveBackendSetupMessage);
         }
         
         // Query Python FastAPI backend
@@ -199,8 +203,7 @@ export const PartnershipMatchEngine: React.FC<PartnershipMatchEngineProps> = ({
         console.log("Match scan aborted by user.");
         setErrorMessage("Scanning cancelled.");
       } else {
-        console.error("Failed connecting to matching endpoint:", err);
-        setErrorMessage("Live sources unavailable. Switch to Presentation Mode or retry.");
+        setErrorMessage((err as Error).message || liveBackendSetupMessage);
         setMatches([]);
       }
     } finally {
@@ -325,7 +328,7 @@ export const PartnershipMatchEngine: React.FC<PartnershipMatchEngineProps> = ({
         {mode === 'realworld' && !backendHealthy && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: 'var(--accent-magenta)', backgroundColor: 'rgba(236,72,153,0.1)', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(236,72,153,0.2)', flexShrink: 0 }}>
             <ShieldAlert size={13} />
-            <span>FastAPI Backend Offline. Falling back to cached data.</span>
+            <span>{liveBackendSetupMessage}</span>
           </div>
         )}
         {mode === 'realworld' && backendHealthy && backendWarnings.length > 0 && (
