@@ -126,18 +126,6 @@ Action Hub
 
 ---
 
-## Screenshots
-
-> Add screenshots of:
-
-- Landing Page
-- Business Twin Dashboard
-- Partnership Match Engine
-- Strategic Ecosystem
-- Action Hub
-
----
-
 ## Demo
 
 **Video**
