@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# PulseForge AI
 
 ## PulseForge local startup
 
@@ -9,7 +9,7 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
-The frontend checks `VITE_API_BASE_URL` first. If it is not set, it tries common local FastAPI ports including `8000`, `8001`, `8002`, and `8011`.
+The frontend checks `VITE_API_BASE_URL` first. In local development only, if it is not set, it tries common local FastAPI ports including `8000`, `8001`, `8002`, and `8011`.
 
 To force one backend URL:
 
@@ -17,7 +17,21 @@ To force one backend URL:
 VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev:frontend
 ```
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Vercel deployment
+
+PulseForge deploys as a Vite SPA on Vercel. The FastAPI backend must be deployed separately because it needs private API keys.
+
+Vercel settings:
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Environment variable: `VITE_API_BASE_URL=https://your-backend-url`
+
+Do not add backend secrets to Vercel frontend environment variables. Keep `TAVILY_API_KEY`, `NEWS_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, and `GOOGLE_CX` on the backend host only.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full frontend/backend deployment split.
+
+## Vite
 
 Currently, two official plugins are available:
 

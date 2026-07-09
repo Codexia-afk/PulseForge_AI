@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, ArrowRight, BookOpen, CheckCircle2, ChevronDown, ChevronRight, Cpu, Database, Globe, RefreshCw, Search, Send, Sparkles, XCircle } from 'lucide-react';
-import { API_BASE_URL, apiUrl, checkBackendHealth, fetchWithTimeout } from '../lib/api';
+import { API_BASE_URL, API_BASE_URL_LABEL, apiUrl, checkBackendHealth, fetchWithTimeout } from '../lib/api';
 
 interface PresentationWorkspaceProps {
   userProfile: any;
@@ -161,7 +161,9 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
   const frontendUrl = typeof window === 'undefined' ? 'Unknown' : window.location.href;
   const connectionCopy = localBackendHealthy
     ? 'Live backend connected. Public evidence import available.'
-    : `Backend unavailable at ${API_BASE_URL}. Start FastAPI or switch to Presentation Mode.`;
+    : API_BASE_URL
+      ? `Backend unavailable at ${API_BASE_URL}. Check the deployed FastAPI service or switch to Presentation Mode.`
+      : 'Backend URL is not configured. Set VITE_API_BASE_URL to enable Live Intelligence. Presentation Mode works offline.';
   const canImport = localBackendHealthy && !isCheckingBackend && !isOnboardingLoading;
   const importProgress = Math.round(((onboardStepIndex + 1) / pipelineSteps.length) * 100);
 
@@ -426,7 +428,7 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
               <div style={{ borderTop: '1px solid var(--border-color)', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '7px', fontSize: '11px' }}>
                 {[
                   ['Frontend URL', frontendUrl],
-                  ['API Base URL', API_BASE_URL],
+                  ['API Base URL', API_BASE_URL_LABEL],
                   ['Backend Health Status', backendHealthStatus],
                   ['Last Health Check Time', lastHealthCheckTime ? new Date(lastHealthCheckTime).toLocaleTimeString() : 'Not checked'],
                   ['Last API Error', lastApiError || 'None'],

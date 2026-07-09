@@ -1,25 +1,37 @@
-const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8000';
-const FALLBACK_API_BASE_URLS = [
-  DEFAULT_API_BASE_URL,
+const LOCAL_API_BASE_URL = 'http://127.0.0.1:8000';
+const LOCAL_FALLBACK_API_BASE_URLS = [
+  LOCAL_API_BASE_URL,
   'http://127.0.0.1:8001',
   'http://127.0.0.1:8002',
   'http://127.0.0.1:8011'
 ];
 
-const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
+const configuredApiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '');
+const isDevelopment = import.meta.env.DEV;
 
-export let API_BASE_URL = configuredApiBaseUrl;
+export const isApiBaseUrlConfigured = Boolean(configuredApiBaseUrl);
+export let API_BASE_URL = configuredApiBaseUrl || (isDevelopment ? LOCAL_API_BASE_URL : '');
+export const API_BASE_URL_LABEL = API_BASE_URL || 'Not configured';
 
 const getCandidateApiBaseUrls = () => {
-  if (import.meta.env.VITE_API_BASE_URL) {
+  if (configuredApiBaseUrl) {
     return [configuredApiBaseUrl];
   }
 
-  return Array.from(new Set([configuredApiBaseUrl, ...FALLBACK_API_BASE_URLS].map((url) => url.replace(/\/$/, ''))));
+  if (!isDevelopment) {
+    return [];
+  }
+
+  return Array.from(new Set(LOCAL_FALLBACK_API_BASE_URLS.map((url) => url.replace(/\/$/, ''))));
 };
 
-export const apiUrl = (path: string) =>
-  `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+export const apiUrl = (path: string) => {
+  if (!API_BASE_URL) {
+    throw new Error('Backend URL is not configured. Set VITE_API_BASE_URL to enable Live Intelligence.');
+  }
+
+  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+};
 
 export interface BackendHealthResult {
   ok: boolean;
@@ -60,8 +72,19 @@ export const fetchWithTimeout = async (
 export const checkBackendHealth = async (): Promise<BackendHealthResult> => {
   const checkedAt = new Date().toISOString();
   const errors: string[] = [];
+  const candidates = getCandidateApiBaseUrls();
 
-  for (const baseUrl of getCandidateApiBaseUrls()) {
+  if (candidates.length === 0) {
+    return {
+      ok: false,
+      status: 'offline',
+      checkedAt,
+      baseUrl: API_BASE_URL_LABEL,
+      error: 'Backend URL is not configured. Add VITE_API_BASE_URL in Vercel to enable Live Intelligence.'
+    };
+  }
+
+  for (const baseUrl of candidates) {
     try {
       const response = await fetchWithTimeout(`${baseUrl}/api/health`, {}, 1500);
 
@@ -89,7 +112,7 @@ export const checkBackendHealth = async (): Promise<BackendHealthResult> => {
     ok: false,
     status: 'offline',
     checkedAt,
-    baseUrl: API_BASE_URL,
+    baseUrl: API_BASE_URL_LABEL,
     error: errors.length > 0 ? errors.join(' | ') : 'Backend health check failed'
   };
 };

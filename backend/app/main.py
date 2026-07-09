@@ -23,7 +23,7 @@ from app.services.partnership_intelligence_engine import match_partnership_intel
 from app.services.prediction_engine import generate_evidence_predictions
 from app.services.explainability_engine import compile_explainability_audit
 from app.services.executive_decision_engine import generate_playbook, generate_executive_decisions
-from app.config import TAVILY_API_KEY, NEWS_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_CX
+from app.config import TAVILY_API_KEY, NEWS_API_KEY, GEMINI_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY, GOOGLE_CX, FRONTEND_ORIGINS
 from pydantic import BaseModel
 from app.services.evidence_importer import import_company_from_public_web
 from app.services.observability import log_event
@@ -44,8 +44,9 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "http://localhost:4173",
         "http://127.0.0.1:4173",
+        *FRONTEND_ORIGINS,
     ],
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://[a-z0-9-]+\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
