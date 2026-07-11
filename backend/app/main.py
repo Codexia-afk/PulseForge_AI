@@ -112,6 +112,23 @@ async def log_requests(request: Request, call_next):
         log_event("api.error", method=request.method, path=request.url.path, elapsedMs=elapsed_ms, error=type(exc).__name__)
         raise
 
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "service": "PulseForge API",
+        "backend": "online",
+        "message": "PulseForge backend is running"
+    }
+
+@app.get("/healthz")
+def healthz():
+    return {
+        "status": "ok",
+        "service": "PulseForge API",
+        "backend": "online"
+    }
+
 @app.get("/api/health")
 def health_check():
     """

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, ArrowRight, BookOpen, CheckCircle2, ChevronDown, ChevronRight, Cpu, Database, Globe, RefreshCw, Search, Send, Sparkles, XCircle } from 'lucide-react';
-import { API_BASE_URL, API_BASE_URL_LABEL, apiUrl, checkBackendHealth, fetchWithTimeout } from '../lib/api';
+import { API_BASE_URL, API_BASE_URL_LABEL, apiUrl, checkBackendHealth, fetchWithTimeout, getHealthCheckUrl } from '../lib/api';
 
 interface PresentationWorkspaceProps {
   userProfile: any;
@@ -33,12 +33,13 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
   const [isOnboardingLoading, setIsOnboardingLoading] = useState<boolean>(false);
   const [isCheckingBackend, setIsCheckingBackend] = useState<boolean>(true);
   const [localBackendHealthy, setLocalBackendHealthy] = useState<boolean>(backendHealthy);
-  const [backendHealthStatus, setBackendHealthStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [backendHealthStatus, setBackendHealthStatus] = useState<'checking' | 'waking' | 'online' | 'offline'>('checking');
   const [onboardStepIndex, setOnboardStepIndex] = useState<number>(0);
   const [onboardProfile, setOnboardProfile] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastHealthCheckTime, setLastHealthCheckTime] = useState<string | null>(null);
   const [lastApiError, setLastApiError] = useState<string | null>(null);
+  const [lastHealthUrl, setLastHealthUrl] = useState<string>(getHealthCheckUrl() || 'Not configured');
   const [hasImportAttempted, setHasImportAttempted] = useState<boolean>(false);
   const [diagnosticsOpen, setDiagnosticsOpen] = useState<boolean>(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -46,14 +47,19 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
 
   const runBackendHealthCheck = async () => {
     setIsCheckingBackend(true);
-    setBackendHealthStatus('checking');
-    const result = await checkBackendHealth();
-    setLocalBackendHealthy(result.ok);
+    setBackendHealthStatus('waking');
+    setLastApiError(null);
+    try {
+      const result = await checkBackendHealth();
+      setLocalBackendHealthy(result.ok);
       setBackendHealthStatus(result.ok ? 'online' : 'offline');
       setLastHealthCheckTime(result.checkedAt);
+      setLastHealthUrl(result.healthUrl || getHealthCheckUrl(result.baseUrl) || 'Not configured');
       setLastApiError(result.error || null);
-    setIsCheckingBackend(false);
-    return result;
+      return result;
+    } finally {
+      setIsCheckingBackend(false);
+    }
   };
 
   useEffect(() => {
@@ -161,6 +167,8 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
   const frontendUrl = typeof window === 'undefined' ? 'Unknown' : window.location.href;
   const connectionCopy = localBackendHealthy
     ? 'Live backend connected. Public evidence import available.'
+    : isCheckingBackend
+      ? 'Waking up backend...'
     : API_BASE_URL
       ? `Backend unavailable at ${API_BASE_URL}. Check the deployed FastAPI service or switch to Presentation Mode.`
       : 'Backend URL is not configured. Set VITE_API_BASE_URL to enable Live Intelligence. Presentation Mode works offline.';
@@ -209,7 +217,7 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
             <div style={{ fontSize: '11.5px', color: localBackendHealthy ? 'var(--accent-green)' : 'var(--accent-amber)', backgroundColor: localBackendHealthy ? 'rgba(34,197,94,0.06)' : 'rgba(245,158,11,0.06)', padding: '9px 10px', borderRadius: '6px', border: localBackendHealthy ? '1px solid rgba(34,197,94,0.2)' : '1px solid rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {localBackendHealthy ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
-                {isCheckingBackend ? 'Checking backend connection...' : connectionCopy}
+                {connectionCopy}
               </span>
               <button
                 type="button"
@@ -429,6 +437,7 @@ export const PresentationWorkspace: React.FC<PresentationWorkspaceProps> = ({
                 {[
                   ['Frontend URL', frontendUrl],
                   ['API Base URL', API_BASE_URL_LABEL],
+                  ['Health URL', lastHealthUrl],
                   ['Backend Health Status', backendHealthStatus],
                   ['Last Health Check Time', lastHealthCheckTime ? new Date(lastHealthCheckTime).toLocaleTimeString() : 'Not checked'],
                   ['Last API Error', lastApiError || 'None'],
